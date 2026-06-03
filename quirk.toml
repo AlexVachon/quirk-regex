@@ -1,0 +1,8 @@
+name          = "regex"
+version       = "1.0.0"
+license       = "MIT"
+description   = "Regular expressions (POSIX Extended Regular Expressions, ERE). Supported: literals · anchors `^` `$` · character classes `[abc]` `[^abc]` `[a-z]` quantifiers `*` `+` `?` `{n}` `{n,m}` · grouping `("
+repository    = "github.com/AlexVachon/quirk-regex"
+quirk-version = ">=1.4.0"
+
+[deps]
