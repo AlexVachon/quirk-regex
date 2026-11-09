@@ -1,0 +1,66 @@
+// Tests for the regex package. Run with `quirk test`.
+use regex
+from regex use { Match }
+
+define test_test_matches_anywhere() -> void {
+    digits := regex.compile("[0-9]+")
+    assert digits.test("abc 42 def")
+    assert not digits.test("no digits")
+    assert not digits.test("")
+}
+
+define test_find_returns_text_and_span() -> void {
+    m := regex.compile("[0-9]+").find("hello 123 world 456")
+    assert m.text == "123"
+    assert m.start == 6
+    assert m.end == 9
+}
+
+define test_find_without_a_match_is_null() -> void {
+    assert regex.compile("[0-9]+").find("nothing here") == null
+}
+
+define test_capture_groups() -> void {
+    m := regex.compile("([0-9]+)-([0-9]+)").find("range 12-345 inside")
+    assert m.text == "12-345"
+    assert m.groups.get(0) == "12"
+    assert m.groups.get(1) == "345"
+}
+
+define test_find_all() -> void {
+    all := regex.compile("[0-9]+").find_all("a1 b22 c333 d4444")
+    assert all.length() == 4
+    texts := []
+    for item in all {
+        it: Match = item
+        texts.append(it.text)
+    }
+    assert texts == ["1", "22", "333", "4444"]
+}
+
+define test_replace_all_with_backreferences() -> void {
+    assert regex.compile("[0-9]+").replace_all("phone 555-1234 or 555-5678", "###") == "phone ###-### or ###-###"
+    assert regex.compile("([0-9]+)-([0-9]+)").replace_all("a 1-2 and 5-9 b", "(\\1..\\2)") == "a (1..2) and (5..9) b"
+}
+
+define test_split_on_whitespace() -> void {
+    parts := regex.compile("[[:space:]]+").split("hello   world\tfoo bar")
+    assert parts == ["hello", "world", "foo", "bar"]
+}
+
+define test_case_insensitive_flag() -> void {
+    assert regex.compile("hello", "i").test("HELLO")
+    assert not regex.test("hello", "HELLO")
+}
+
+define test_anchors() -> void {
+    starts := regex.compile("^abc")
+    assert starts.test("abcdef")
+    assert not starts.test("xabc")
+}
+
+define test_module_shortcuts() -> void {
+    assert regex.test("[A-Z]+", "hello WORLD")
+    assert regex.find("[A-Z]+", "hello WORLD").text == "WORLD"
+    assert regex.replace_all("[aeiou]", "hello world", "*") == "h*ll* w*rld"
+}
